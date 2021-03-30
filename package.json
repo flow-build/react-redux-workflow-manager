@@ -15,9 +15,9 @@
   "dependencies": {
     "@reduxjs/toolkit": "^1.5.0",
     "paho-mqtt": "^1.1.0",
+    "react-native-dotenv": "^2.5.3",
     "react-redux": "^7.2.2"
   },
-  "devDependencies": {},
   "repository": {
     "type": "git",
     "url": "git+https://github.com/flow-build/react-redux-workflow-manager.git"
