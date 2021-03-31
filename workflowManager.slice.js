@@ -1,5 +1,5 @@
 import { createSlice } from "@reduxjs/toolkit";
-import { HOST_WF_SLICE } from 'react-native-dotenv';
+import { HOST_WF_SLICE } from "react-native-dotenv";
 
 export const HOST = HOST_WF_SLICE;
 
@@ -131,7 +131,6 @@ export const getAvailableActivityManagersAsync = (filter) => async (
   getState
 ) => {
   try {
-
     const baseURL = `${HOST}/processes/available`;
     const URL = filter ? `${baseURL}?${filter}` : baseURL;
 
@@ -142,7 +141,7 @@ export const getAvailableActivityManagersAsync = (filter) => async (
 
     if (r.ok) {
       const responseActivityManagers = await r.json();
-      
+
       const availableActivityManagers = Object.fromEntries(
         responseActivityManagers.map((am) => [am.id, am])
       );
@@ -217,20 +216,23 @@ export const submitActivityToActivityManagerAsync = (
   }
 };
 
-export const startWorkflowAsync = (workflowName, payload = {}, setFocus = true) => async (
-  dispach,
-  getState
-) => {
+export const startWorkflowAsync = (
+  workflowName,
+  payload = {},
+  setFocus = true
+) => async (dispach, getState) => {
   try {
     const r = await fetch(`${HOST}/workflows/name/${workflowName}/start`, {
       method: "POST",
       ...getDefaultHeaders(getState),
-      body: JSON.stringify(payload)
+      body: JSON.stringify(payload),
     });
 
     if (r.ok && setFocus) {
       const responseWorkflow = await r.json();
-      
+
+      // console.log('responseWorkflow.process_id', responseWorkflow.process_id)
+
       dispach(
         setFocusProcess({
           processId: responseWorkflow.process_id,
