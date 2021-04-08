@@ -11,6 +11,7 @@ const INITIAL_STATE = {
   focusProcess: null,
   mqttConfig: {},
   mqttIsConnected: false,
+  defaultProcess: null,
 };
 
 const getDefaultHeaders = (getState) => {
@@ -19,6 +20,8 @@ const getDefaultHeaders = (getState) => {
   };
 
   const token = getState()?.login?.token;
+
+  console.log("token", token);
 
   if (token) {
     headers["Authorization"] = `Bearer ${token}`;
@@ -95,6 +98,13 @@ export const workflowManagerSlice = createSlice({
       };
     },
 
+    updateDefaultProcess: (state, { payload: { defaultProcess } }) => {
+      return {
+        ...state,
+        defaultProcess,
+      };
+    },
+
     resetState: () => INITIAL_STATE,
   },
 });
@@ -105,6 +115,7 @@ export const {
   setFocusProcess,
   addActivityManager,
   removeActivityManager,
+  updateDefaultProcess,
 } = workflowManagerSlice.actions;
 
 export const getAvailableWorkflowsAsync = () => async (dispatch, getState) => {
@@ -134,10 +145,14 @@ export const getAvailableActivityManagersAsync = (filter) => async (
     const baseURL = `${HOST}/processes/available`;
     const URL = filter ? `${baseURL}?${filter}` : baseURL;
 
+    console.log("URL", URL);
+
     const r = await fetch(`${URL}`, {
       method: "GET",
       ...getDefaultHeaders(getState),
     });
+
+    console.log("r", JSON.stringify(r));
 
     if (r.ok) {
       const responseActivityManagers = await r.json();
@@ -165,13 +180,18 @@ export const getAvailableActivityManagerForProcessAsync = (processId) => async (
   getState
 ) => {
   try {
+    console.log("processId", processId);
     const r = await fetch(`${HOST}/processes/${processId}/activity`, {
       method: "GET",
       ...getDefaultHeaders(getState),
     });
 
+    // console.log('r', r)
+
     if (r.ok) {
       const activityManager = await r.json();
+
+      dispatch(setFocusProcess({ processId: activityManager.process_id }));
       dispatch(
         workflowManagerSlice.actions.addActivityManager({ activityManager })
       );
@@ -194,6 +214,8 @@ export const submitActivityToActivityManagerAsync = (
         body: JSON.stringify(data),
       }
     );
+
+    console.log("r", r);
 
     if (r.ok) {
       r = await fetch(

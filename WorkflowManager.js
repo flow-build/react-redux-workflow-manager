@@ -7,21 +7,40 @@ import {
   setCurrentActivityManager,
   setFocusProcess,
 } from "./workflowManager.slice";
-import { useSelector } from "react-redux";
+
 import { useDispatch } from "react-redux";
 
+const MQTT_CONFIG_DEFAULT = {
+  host: "broker.hivemq.com",
+  port: 8000,
+  clientId: "fbtaskr896967579608",
+};
+
 export function WorkflowManager({
-  mqttConfig = {
-    host: "broker.hivemq.com",
-    port: 8000,
-    clientId: "fbtaskr896967579608",
-  },
+  sessionId,
+  subscribeTopics = [],
+  mqttConfig = MQTT_CONFIG_DEFAULT,
   children,
-  ...otherProps
 }) {
   const dispatch = useDispatch();
   const [mqttClient, setMqttClient] = useState(null);
   const [badConnFlag, setBadConnFlag] = useState(null);
+
+  /* useEffect(() => {
+    return function cleanup() {
+      console.log("Cleanup");
+      if (mqttClient && mqttClient.isConnected()) {
+        try {
+          mqttClient.disconnect();
+        } catch (e) {
+          console.log("DISCONECTED", e);
+        } finally {
+          setMqttClient(null);
+          console.log("Disconnected");
+        }
+      }
+    };
+  }, [mqttClient]); */
 
   useEffect(() => {
     console.log("Use effect called");
@@ -48,6 +67,7 @@ export function WorkflowManager({
       function onConnect() {
         // Once a connection has been made, make a subscription and send a message.
         console.log("Connected");
+        // subscribeTopics.forEach(topic => client.subscribe(topic));
         client.subscribe("/session/+/am/#");
         client.subscribe("/actor/+/am/#");
       }
@@ -62,15 +82,16 @@ export function WorkflowManager({
 
       // called when a message arrives
       async function onMessageArrived(message) {
-        console.log("Receveid message", message.topic);
+        // console.log("Receveid message", message.topic);
         const activityManager = JSON.parse(message.payloadString);
         const topic = message.topic;
+        console.log("Topic: ", topic);
 
         const session_id = await AsyncStorage.getItem("@session_id");
         const actor_id = await AsyncStorage.getItem("@actor_id");
 
-        console.log("ASYNC session_id", session_id);
-        console.log("ASYNC actor_id", actor_id);
+        // console.log("ASYNC session_id", session_id);
+        // console.log("ASYNC actor_id", actor_id);
 
         let action = "";
         let messageConsole = "";
@@ -137,19 +158,7 @@ export function WorkflowManager({
       setMqttClient(client);
     }
 
-    return function cleanup() {
-      console.log("Cleanup");
-      if (mqttClient) {
-        try {
-          mqttClient.disconnect();
-        } catch (e) {
-          console.log("DISCONECTED", e);
-        } finally {
-          setMqttClient(null);
-          console.log("Disconnected");
-        }
-      }
-    };
+    // return () => {console.log('hahaha smite')}
   }, [mqttConfig, mqttClient, dispatch, badConnFlag]);
 
   return children;
