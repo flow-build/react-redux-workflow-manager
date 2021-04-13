@@ -13,9 +13,10 @@ export function useWorkflowManager() {
   /**
    * Start an workflow
    * @param {String} workflowName Represents the workflow's name
+   * @param {String} [body = {}] JSON to send to start the workflow
    */
-  function startWorkflow(workflowName) {
-    dispatch(startWorkflowAsync(workflowName));
+  function startWorkflow(workflowName, body = {}) {
+    dispatch(startWorkflowAsync(workflowName, body));
   }
 
   /**
