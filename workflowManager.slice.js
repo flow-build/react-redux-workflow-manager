@@ -1,7 +1,6 @@
 import { createSlice } from "@reduxjs/toolkit";
-import { HOST_WF_SLICE } from "react-native-dotenv";
 
-export const HOST = HOST_WF_SLICE;
+let HOST;
 
 const INITIAL_STATE = {
   activityManagerOrder: [],
@@ -253,7 +252,7 @@ export const startWorkflowAsync = (
     if (r.ok && setFocus) {
       const responseWorkflow = await r.json();
 
-      // console.log('responseWorkflow.process_id', responseWorkflow.process_id)
+      console.log("responseWorkflow.process_id", responseWorkflow.process_id);
 
       dispach(
         setFocusProcess({
@@ -290,4 +289,9 @@ export const selectFocusProcess = (state) => state.workflowManager.focusProcess;
 
 export const wfStart = (state) => state.startWorkflow;
 
-export default workflowManagerSlice.reducer;
+const WorkflowManagerSlice = (URL) => {
+  HOST = URL;
+  return workflowManagerSlice.reducer;
+};
+
+export default WorkflowManagerSlice;
