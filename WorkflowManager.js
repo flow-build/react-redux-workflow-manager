@@ -10,10 +10,17 @@ import {
 
 import { useDispatch } from "react-redux";
 
+const chars = [
+  ..."abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789",
+];
+const randomId = [...Array(19)].map(
+  (i) => chars[(Math.random() * chars.length) | 0]
+).join``;
+
 const MQTT_CONFIG_DEFAULT = {
   host: "broker.hivemq.com",
   port: 8000,
-  clientId: "fbtaskr896967579608",
+  clientId: randomId,
 };
 
 export function WorkflowManager({
