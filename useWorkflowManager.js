@@ -10,9 +10,13 @@ import {
 
 import { loginAction, updateState as updateLogin } from "./login.slice";
 
+let handler = null;
+let flag = false;
+
 export function useWorkflowManager() {
   const dispatch = useDispatch();
   const currentActivity = useSelector(selectCurrentActivityManager);
+  const { defaultProcess } = useSelector((state) => state.workflowManager);
 
   /**
    * Make a Anonymous Login
@@ -22,6 +26,10 @@ export function useWorkflowManager() {
     dispatch(loginAction.getAnonymousToken(URL));
   }
 
+  /**
+   * Get the available activities by processId
+   * @param {String} processId It represents the process' Id
+   */
   function getAvailableActivityByProcessId(processId) {
     dispatch(getAvailableActivityManagerForProcessAsync(processId));
   }
@@ -40,6 +48,44 @@ export function useWorkflowManager() {
    */
   function setLogin(login) {
     dispatch(updateLogin(login));
+  }
+
+  /**
+   * Function to set the default process and navigation
+   * @param {String} defaultWF The name of workflow to be set as the default
+   * @param {Function} customFn Custom function to manage screen navigation
+   * @returns {Function} Returns the function that was provided in customFn
+   */
+  function setNavigation(defaultWF, customFn) {
+    try {
+      if (!currentActivity && !handler) {
+        handler = setTimeout(async () => {
+          if (!defaultProcess || flag) {
+            startWorkflow(defaultWF);
+            flag = false;
+          } else {
+            getAvailableActivityByProcessId(defaultProcess);
+            flag = true;
+            clearTimeout(handler);
+            handler = null;
+          }
+        }, 1000);
+      } else if (currentActivity) {
+        clearTimeout(handler);
+        handler = null;
+        flag = false;
+
+        if (!defaultProcess) {
+          setDefaultProcess(currentActivity.process_id);
+        }
+
+        return customFn();
+      }
+    } catch (error) {
+      getAvailableActivityByProcessId(defaultProcess);
+      const message = "Erro ao tentar mudar de página na navigation.";
+      console.error(message, error);
+    }
   }
 
   /**
@@ -65,6 +111,7 @@ export function useWorkflowManager() {
     getAvailableActivityByProcessId,
     setDefaultProcess,
     setLogin,
+    setNavigation,
     startWorkflow,
     submitActivity,
   };
