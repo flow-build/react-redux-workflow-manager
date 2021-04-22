@@ -18,7 +18,11 @@ const getDefaultHeaders = (getState) => {
     "Content-Type": "application/json",
   };
 
-  const token = getState()?.login?.token;
+  let token;
+
+  if (getState() && getState().login && getState().login.token) {
+    token = getState().login.token;
+  }
 
   console.log("token", token);
 
