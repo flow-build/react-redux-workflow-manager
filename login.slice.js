@@ -1,6 +1,6 @@
 import { createSlice } from "@reduxjs/toolkit";
 import jwtDecode from "jwt-decode";
-import AsyncStorage from "@react-native-async-storage/async-storage";
+// import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const INITIAL_STATE = {
   actor_id: null,
@@ -48,11 +48,11 @@ const loginAction = {
 
         // console.log("data.jwtToken", data.jwtToken);
 
-        await AsyncStorage.removeItem("@session_id");
-        await AsyncStorage.removeItem("@actor_id");
-        await AsyncStorage.setItem("TOKEN", data.jwtToken);
-        await AsyncStorage.setItem("@session_id", session_id);
-        await AsyncStorage.setItem("@actor_id", actor_id);
+        // await AsyncStorage.removeItem("@session_id");
+        // await AsyncStorage.removeItem("@actor_id");
+        // await AsyncStorage.setItem("TOKEN", data.jwtToken);
+        // await AsyncStorage.setItem("@session_id", session_id);
+        // await AsyncStorage.setItem("@actor_id", actor_id);
 
         dispatch(
           loginSlice.actions.updateState({
