@@ -24,8 +24,6 @@ const getDefaultHeaders = (getState) => {
     token = getState().login.token;
   }
 
-  console.log("token", token);
-
   if (token) {
     headers["Authorization"] = `Bearer ${token}`;
   }
@@ -140,142 +138,126 @@ export const getAvailableWorkflowsAsync = () => async (dispatch, getState) => {
   }
 };
 
-export const getAvailableActivityManagersAsync = (filter) => async (
-  dispatch,
-  getState
-) => {
-  try {
-    const baseURL = `${HOST}/processes/available`;
-    const URL = filter ? `${baseURL}?${filter}` : baseURL;
+export const getAvailableActivityManagersAsync =
+  (filter) => async (dispatch, getState) => {
+    try {
+      const baseURL = `${HOST}/processes/available`;
+      const URL = filter ? `${baseURL}?${filter}` : baseURL;
 
-    console.log("URL", URL);
+      console.log("URL", URL);
 
-    const r = await fetch(`${URL}`, {
-      method: "GET",
-      ...getDefaultHeaders(getState),
-    });
-
-    console.log("r", JSON.stringify(r));
-
-    if (r.ok) {
-      const responseActivityManagers = await r.json();
-
-      const availableActivityManagers = Object.fromEntries(
-        responseActivityManagers.map((am) => [am.id, am])
-      );
-
-      const activityManagerOrder = Object.keys(availableActivityManagers);
-
-      dispatch(
-        workflowManagerSlice.actions.updateAvailableActivityManagers({
-          availableActivityManagers,
-          activityManagerOrder,
-        })
-      );
-    }
-  } catch (e) {
-    console.log(e);
-  }
-};
-
-export const getAvailableActivityManagerForProcessAsync = (processId) => async (
-  dispatch,
-  getState
-) => {
-  try {
-    console.log("processId", processId);
-    const r = await fetch(`${HOST}/processes/${processId}/activity`, {
-      method: "GET",
-      ...getDefaultHeaders(getState),
-    });
-
-    // console.log('r', r)
-
-    if (r.ok) {
-      const activityManager = await r.json();
-
-      dispatch(setFocusProcess({ processId: activityManager.process_id }));
-      dispatch(
-        workflowManagerSlice.actions.addActivityManager({ activityManager })
-      );
-    }
-  } catch (e) {
-    console.log(e);
-  }
-};
-
-export const submitActivityToActivityManagerAsync = (
-  activityManagerId,
-  data
-) => async (dispatch, getState) => {
-  try {
-    let r = await fetch(
-      `${HOST}/activity_manager/${activityManagerId}/submit`,
-      {
-        method: "POST",
+      const r = await fetch(`${URL}`, {
+        method: "GET",
         ...getDefaultHeaders(getState),
-        body: JSON.stringify(data),
+      });
+
+      if (r.ok) {
+        const responseActivityManagers = await r.json();
+
+        const availableActivityManagers = Object.fromEntries(
+          responseActivityManagers.map((am) => [am.id, am])
+        );
+
+        const activityManagerOrder = Object.keys(availableActivityManagers);
+
+        dispatch(
+          workflowManagerSlice.actions.updateAvailableActivityManagers({
+            availableActivityManagers,
+            activityManagerOrder,
+          })
+        );
       }
-    );
+    } catch (e) {
+      console.log(e);
+    }
+  };
 
-    console.log("r", r);
+export const getAvailableActivityManagerForProcessAsync =
+  (processId) => async (dispatch, getState) => {
+    try {
+      console.log("processId", processId);
+      const r = await fetch(`${HOST}/processes/${processId}/activity`, {
+        method: "GET",
+        ...getDefaultHeaders(getState),
+      });
 
-    if (r.ok) {
-      r = await fetch(
-        `${HOST}/processes/activity_manager/${activityManagerId}`,
+      if (r.ok) {
+        const activityManager = await r.json();
+
+        dispatch(setFocusProcess({ processId: activityManager.process_id }));
+        dispatch(
+          workflowManagerSlice.actions.addActivityManager({ activityManager })
+        );
+      }
+    } catch (e) {
+      console.log(e);
+    }
+  };
+
+export const submitActivityToActivityManagerAsync =
+  (activityManagerId, data) => async (dispatch, getState) => {
+    try {
+      let r = await fetch(
+        `${HOST}/activity_manager/${activityManagerId}/submit`,
         {
-          method: "GET",
+          method: "POST",
           ...getDefaultHeaders(getState),
+          body: JSON.stringify(data),
         }
       );
 
-      r.status === 404 &&
-        dispatch(
-          workflowManagerSlice.actions.removeActivityManager({
-            activityManagerId,
+      if (r.ok) {
+        r = await fetch(
+          `${HOST}/processes/activity_manager/${activityManagerId}`,
+          {
+            method: "GET",
+            ...getDefaultHeaders(getState),
+          }
+        );
+
+        r.status === 404 &&
+          dispatch(
+            workflowManagerSlice.actions.removeActivityManager({
+              activityManagerId,
+            })
+          );
+      }
+    } catch (e) {
+      console.log(e);
+    }
+  };
+
+export const startWorkflowAsync =
+  (workflowName, payload = {}, setFocus = true) =>
+  async (dispach, getState) => {
+    try {
+      const r = await fetch(`${HOST}/workflows/name/${workflowName}/start`, {
+        method: "POST",
+        ...getDefaultHeaders(getState),
+        body: JSON.stringify(payload),
+      });
+
+      if (r.ok && setFocus) {
+        const responseWorkflow = await r.json();
+
+        console.log("responseWorkflow.process_id", responseWorkflow.process_id);
+
+        dispach(
+          setFocusProcess({
+            processId: responseWorkflow.process_id,
           })
         );
+      }
+    } catch (e) {
+      console.log(e);
     }
-  } catch (e) {
-    console.log(e);
-  }
-};
+  };
 
-export const startWorkflowAsync = (
-  workflowName,
-  payload = {},
-  setFocus = true
-) => async (dispach, getState) => {
-  try {
-    const r = await fetch(`${HOST}/workflows/name/${workflowName}/start`, {
-      method: "POST",
-      ...getDefaultHeaders(getState),
-      body: JSON.stringify(payload),
-    });
-
-    if (r.ok && setFocus) {
-      const responseWorkflow = await r.json();
-
-      console.log("responseWorkflow.process_id", responseWorkflow.process_id);
-
-      dispach(
-        setFocusProcess({
-          processId: responseWorkflow.process_id,
-        })
-      );
-    }
-  } catch (e) {
-    console.log(e);
-  }
-};
-
-export const setFocusAndFetchActivityManagerAsync = (processId) => async (
-  dispatch,
-  getState
-) => {
-  await dispatch(setFocusProcess({ processId }));
-  await dispatch(getAvailableActivityManagerForProcessAsync(processId));
-};
+export const setFocusAndFetchActivityManagerAsync =
+  (processId) => async (dispatch, getState) => {
+    await dispatch(setFocusProcess({ processId }));
+    await dispatch(getAvailableActivityManagerForProcessAsync(processId));
+  };
 
 export const selectAvailableWorkflows = (state) =>
   state.workflowManager.availableWorkflows;
