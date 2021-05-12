@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { Client } from "paho-mqtt";
-// import AsyncStorage from "@react-native-async-storage/async-storage";
+import AsyncStorage from "@callstack/async-storage";
+
 import {
   removeActivityManager,
   addActivityManager,
@@ -32,22 +33,6 @@ export function WorkflowManager({
   const dispatch = useDispatch();
   const [mqttClient, setMqttClient] = useState(null);
   const [badConnFlag, setBadConnFlag] = useState(null);
-
-  /* useEffect(() => {
-    return function cleanup() {
-      console.log("Cleanup");
-      if (mqttClient && mqttClient.isConnected()) {
-        try {
-          mqttClient.disconnect();
-        } catch (e) {
-          console.log("DISCONECTED", e);
-        } finally {
-          setMqttClient(null);
-          console.log("Disconnected");
-        }
-      }
-    };
-  }, [mqttClient]); */
 
   useEffect(() => {
     console.log("Use effect called");
@@ -89,40 +74,20 @@ export function WorkflowManager({
 
       // called when a message arrives
       async function onMessageArrived(message) {
-        console.log("Receveid message", message.topic);
         const activityManager = JSON.parse(message.payloadString);
         const topic = message.topic;
-        console.log("Topic: ", topic);
 
-        const session_id = "";
-        const actor_id = "";
-
-        // const session_id = await AsyncStorage.getItem("@session_id");
-        // const actor_id = await AsyncStorage.getItem("@actor_id");
-
-        // console.log("ASYNC session_id", session_id);
-        // console.log("ASYNC actor_id", actor_id);
-
-        let action = "";
-        let messageConsole = "";
+        const session_id = await AsyncStorage.getItem("@session_id");
+        const actor_id = await AsyncStorage.getItem("@actor_id");
 
         switch (topic) {
           case `/session/${session_id}/am/create`:
           case `/actor/${actor_id}/am/create`:
-            // action = "(A action é " + activityManager.props.action + ").";
-            // messageConsole = `\x1b[31m${"\n\tEntrou no CREATE."}\x1b[36m${action}\x1b[0m`;
-            // messageConsole += `\n\x1b[36m\t- Activity Manager adicionado na fila. (ID: ${activityManager.id})\x1b[0m`;
-            // console.log(messageConsole);
-
             dispatch(addActivityManager({ activityManager }));
             break;
 
           case `/session/${session_id}/am/remove`:
           case `/actor/${actor_id}/am/remove`:
-            // messageConsole = `\x1b[31m${"\n\tEntrou no REMOVE."}.`;
-            // messageConsole += `\n\x1b[36m\t- Activity Manager removido na fila. (ID: ${activityManager.activity_manager_id})\x1b[0m`;
-            // console.log(messageConsole);
-
             dispatch(
               removeActivityManager({
                 activityManagerId: activityManager.activity_manager_id,
@@ -132,12 +97,6 @@ export function WorkflowManager({
 
           case `/session/${session_id}/am/focus`:
           case `/actor/${actor_id}/am/focus`:
-            // action = "(A action é " + activityManager?.props?.action + ").";
-            // messageConsole = `\x1b[31m${"\n\tEntrou no FOCUS da Atividade."}\x1b[36m${action}\x1b[0m`;
-            // messageConsole += `\n\x1b[36m\t- Foco do processo setado para o da atividade. (${activityManager.process_id})`;
-            // messageConsole += `\n\x1b[36m\t- Atividade atual setado para o id da atividade. (${activityManager.id})\x1b[0m`;
-            // console.log(messageConsole);
-
             dispatch(
               setFocusProcess({ processId: activityManager.process_id })
             );
@@ -150,11 +109,6 @@ export function WorkflowManager({
 
           case `/session/${session_id}/process/focus`:
           case `/actor/${actor_id}/process/focus`:
-            // action = "(A action é " + activityManager?.props?.action + ").";
-            // messageConsole = `\x1b[31m${"\n\tEntrou no FOCUS do Processo."}\x1b[36m${action}\x1b[0m`;
-            // messageConsole += `\n\x1b[36m\t- Foco do processo setado para o da atividade. (${activityManager.process_id})\x1b[0m`;
-            // console.log(messageConsole);
-
             dispatch(
               setFocusProcess({ processId: activityManager.process_id })
             );
@@ -167,8 +121,6 @@ export function WorkflowManager({
 
       setMqttClient(client);
     }
-
-    // return () => {console.log('hahaha smite')}
   }, [mqttConfig, mqttClient, dispatch, badConnFlag]);
 
   return children;
