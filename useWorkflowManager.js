@@ -27,6 +27,16 @@ export function useWorkflowManager() {
   }
 
   /**
+   * Function that receive an **actor** and **password** to make login
+   * @param {String} URL The URL to make login
+   * @param {{actor: String, password: String}} body A object to send to login
+   * @returns {Promise} Returns a promise to wait login
+   */
+  function login(URL, body) {
+    return dispatch(loginAction.login(URL, body));
+  }
+
+  /**
    * Get the available activities by processId
    * @param {String} processId It represents the process' Id
    */
@@ -109,6 +119,7 @@ export function useWorkflowManager() {
     anonymousLogin,
     currentActivity,
     getAvailableActivityByProcessId,
+    login,
     setDefaultProcess,
     setLogin,
     setNavigation,
