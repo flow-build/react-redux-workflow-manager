@@ -49,38 +49,6 @@ class ValidationError extends Error {
 }
 
 const loginAction = {
-  getAnonymousToken: (URL) => async (dispatch) => {
-    try {
-      const params = { claims: ["anonymous"] };
-
-      const response = await fetch(URL, {
-        method: "POST",
-        ...getDefaultHeaders(),
-        body: JSON.stringify(params),
-      });
-
-      if (response.ok) {
-        const data = await response.json();
-        const { account_id, actor_id, session_id } = jwtDecode(data.jwtToken);
-
-        dispatch(
-          loginSlice.actions.updateState({
-            actor_id,
-            claims: data.payload.claims,
-            token: data.jwtToken,
-            refresh_token: null,
-            account_id,
-            session_id,
-          })
-        );
-      }
-    } catch (error) {
-      const message = "Erro ao tentar obter token anônimo.";
-      console.error(message, error);
-      throw error;
-    }
-  },
-
   login: (URL, body) => async (dispatch) => {
     try {
       const response = await fetch(URL, {
@@ -92,12 +60,14 @@ const loginAction = {
 
       if (response.ok) {
         const data = await response.json();
-        const { account_id, actor_id, session_id } = jwtDecode(data.token);
+        const token = data.jwtToken ?? data.token;
+
+        const { account_id, actor_id, session_id } = jwtDecode(token);
 
         await AsyncStorage.removeItem("@session_id");
         await AsyncStorage.removeItem("@actor_id");
 
-        await AsyncStorage.setItem("TOKEN", data.token);
+        await AsyncStorage.setItem("TOKEN", token);
         await AsyncStorage.setItem("@session_id", session_id);
         await AsyncStorage.setItem("@actor_id", actor_id);
 
@@ -105,7 +75,7 @@ const loginAction = {
           loginSlice.actions.updateState({
             actor_id,
             claims: data.claims,
-            token: data.token,
+            token,
             refresh_token: data.refresh_token,
             account_id,
             session_id,
