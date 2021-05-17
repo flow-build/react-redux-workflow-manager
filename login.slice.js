@@ -60,7 +60,7 @@ const loginAction = {
 
       if (response.ok) {
         const data = await response.json();
-        const token = data.jwtToken ?? data.token;
+        const token = data.jwtToken ? data.jwtToken : data.token;
 
         const { account_id, actor_id, session_id } = jwtDecode(token);
 
