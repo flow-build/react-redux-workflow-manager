@@ -53,6 +53,7 @@ export function WorkflowManager({
         onSuccess: onConnect,
         onFailure: () => setBadConnFlag(Math.random()),
         keepAliveInterval: 10,
+        reconnect: true,
       });
 
       // called when the client connects
