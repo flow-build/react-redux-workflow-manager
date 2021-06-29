@@ -1,6 +1,6 @@
 {
   "name": "@flowbuild/redux-toolkit-workflow-manager",
-  "version": "1.4.3",
+  "version": "1.4.5",
   "description": "Biblioteca para utilização do Workflow Manager utilizando Redux Toolkit",
   "main": "WorkflowManager.js",
   "scripts": {
@@ -9,13 +9,8 @@
   "author": "",
   "license": "ISC",
   "peerDependencies": {
-    "@react-native-async-storage/async-storage": "^1.14.1",
-    "@reduxjs/toolkit": "^1.5.0",
-    "jwt-decode": "^3.1.2",
-    "paho-mqtt": "^1.1.0",
     "react": "^17.0.1",
-    "react-dom": "^17.0.1",
-    "react-redux": "^7.2.2"
+    "react-dom": "^17.0.1"
   },
   "repository": {
     "type": "git",
@@ -27,7 +22,10 @@
   "homepage": "https://github.com/flow-build/react-redux-workflow-manager#readme",
   "dependencies": {
     "@callstack/async-storage": "^2.0.3",
-    "jwt-decode": "^3.1.2"
+    "@reduxjs/toolkit": "^1.6.0",
+    "jwt-decode": "^3.1.2",
+    "paho-mqtt": "^1.1.0",
+    "react-redux": "^7.2.4"
   },
   "devDependencies": {}
 }
