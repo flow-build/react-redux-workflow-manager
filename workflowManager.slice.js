@@ -1,4 +1,5 @@
 import { createSlice } from "@reduxjs/toolkit";
+import { loginAction } from "./login.slice";
 
 let HOST;
 
@@ -132,6 +133,14 @@ export const getAvailableWorkflowsAsync = () => async (dispatch, getState) => {
       dispatch(
         workflowManagerSlice.actions.updateAvailableWorkflows({ workflowNames })
       );
+    } else if (r.status === 401) {
+      await dispatch(
+        removeActivityManager({
+          activityManagerId:
+            getState().workflowManager.currentActivityManagerId,
+        })
+      );
+      await dispatch(loginAction.logout());
     }
   } catch (e) {
     console.log(e);
@@ -144,7 +153,7 @@ export const getAvailableActivityManagersAsync =
       const baseURL = `${HOST}/processes/available`;
       const URL = filter ? `${baseURL}?${filter}` : baseURL;
 
-      console.log("URL", URL);
+      // console.log("URL", URL);
 
       const r = await fetch(`${URL}`, {
         method: "GET",
@@ -166,6 +175,14 @@ export const getAvailableActivityManagersAsync =
             activityManagerOrder,
           })
         );
+      } else if (r.status === 401) {
+        await dispatch(
+          removeActivityManager({
+            activityManagerId:
+              getState().workflowManager.currentActivityManagerId,
+          })
+        );
+        await dispatch(loginAction.logout());
       }
     } catch (e) {
       console.log(e);
@@ -173,9 +190,8 @@ export const getAvailableActivityManagersAsync =
   };
 
 export const getAvailableActivityManagerForProcessAsync =
-  (processId) => async (dispatch, getState) => {
+  (processId, workflow_name_default) => async (dispatch, getState) => {
     try {
-      console.log("processId", processId);
       const r = await fetch(`${HOST}/processes/${processId}/activity`, {
         method: "GET",
         ...getDefaultHeaders(getState),
@@ -188,6 +204,16 @@ export const getAvailableActivityManagerForProcessAsync =
         dispatch(
           workflowManagerSlice.actions.addActivityManager({ activityManager })
         );
+      } else if (r.status === 404) {
+        dispatch(startWorkflowAsync(workflow_name_default, {}));
+      } else if (r.status === 401) {
+        await dispatch(
+          removeActivityManager({
+            activityManagerId:
+              getState().workflowManager.currentActivityManagerId,
+          })
+        );
+        await dispatch(loginAction.logout());
       }
     } catch (e) {
       console.log(e);
@@ -221,6 +247,14 @@ export const submitActivityToActivityManagerAsync =
               activityManagerId,
             })
           );
+      } else if (r.status === 401) {
+        await dispatch(
+          removeActivityManager({
+            activityManagerId:
+              getState().workflowManager.currentActivityManagerId,
+          })
+        );
+        await dispatch(loginAction.logout());
       }
     } catch (e) {
       console.log(e);
@@ -229,24 +263,38 @@ export const submitActivityToActivityManagerAsync =
 
 export const startWorkflowAsync =
   (workflowName, payload = {}, setFocus = true) =>
-  async (dispach, getState) => {
+  async (dispatch, getState) => {
     try {
+      // console.log('SLICE START WORKFLOW ====>', workflowName)
       const r = await fetch(`${HOST}/workflows/name/${workflowName}/start`, {
         method: "POST",
         ...getDefaultHeaders(getState),
         body: JSON.stringify(payload),
       });
 
+      // console.log('SLICE START r ====>', r)
+
+      // console.log('r', r)
+
       if (r.ok && setFocus) {
         const responseWorkflow = await r.json();
 
-        console.log("responseWorkflow.process_id", responseWorkflow.process_id);
+        // console.log('SLICE START responseWorkflow ====> ', responseWorkflow.process_id)
+        // console.log("responseWorkflow.process_id", responseWorkflow.process_id);
 
-        dispach(
+        await dispatch(
           setFocusProcess({
             processId: responseWorkflow.process_id,
           })
         );
+      } else if (r.status === 401) {
+        await dispatch(
+          removeActivityManager({
+            activityManagerId:
+              getState().workflowManager.currentActivityManagerId,
+          })
+        );
+        await dispatch(loginAction.logout());
       }
     } catch (e) {
       console.log(e);

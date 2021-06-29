@@ -39,9 +39,18 @@ export function useWorkflowManager() {
   /**
    * Get the available activities by processId
    * @param {String} processId It represents the process' Id
+   * @param {String} workflow_name_default Workflow Name
    */
-  function getAvailableActivityByProcessId(processId) {
-    dispatch(getAvailableActivityManagerForProcessAsync(processId));
+  async function getAvailableActivityByProcessId(
+    processId,
+    workflow_name_default
+  ) {
+    return await dispatch(
+      getAvailableActivityManagerForProcessAsync(
+        processId,
+        workflow_name_default
+      )
+    );
   }
 
   /**
@@ -74,7 +83,7 @@ export function useWorkflowManager() {
             startWorkflow(defaultWF);
             flag = false;
           } else {
-            getAvailableActivityByProcessId(defaultProcess);
+            getAvailableActivityByProcessId(defaultProcess, defaultWF);
             flag = true;
             clearTimeout(handler);
             handler = null;
@@ -92,7 +101,7 @@ export function useWorkflowManager() {
         return customFn();
       }
     } catch (error) {
-      getAvailableActivityByProcessId(defaultProcess);
+      getAvailableActivityByProcessId(defaultProcess, defaultWF);
       const message = "Erro ao tentar mudar de página na navigation.";
       console.error(message, error);
     }

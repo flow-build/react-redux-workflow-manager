@@ -88,6 +88,13 @@ const loginAction = {
       throw error;
     }
   },
+  logout: () => async (dispatch) => {
+    await AsyncStorage.removeItem("@session_id");
+    await AsyncStorage.removeItem("@actor_id");
+    await AsyncStorage.removeItem("TOKEN");
+
+    await dispatch(loginSlice.actions.resetState());
+  },
 };
 
 export { loginAction };
