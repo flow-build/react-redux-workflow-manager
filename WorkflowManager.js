@@ -61,8 +61,7 @@ export function WorkflowManager({
         // Once a connection has been made, make a subscription and send a message.
         console.log('Connected');
         // subscribeTopics.forEach(topic => client.subscribe(topic));
-        client.subscribe('/session/+/am/#');
-        client.subscribe('/actor/+/am/#');
+        client.subscribe(`/session/${sessionId}/am/#`, { qos: 1 });
       }
 
       // called when the client loses its connection
@@ -82,12 +81,11 @@ export function WorkflowManager({
         const actor_id = await AsyncStorage.getItem('@actor_id');
 
         if (session_id) {
-          client.unsubscribe('/session/+/am/#');
+          client.unsubscribe(`/session/${sessionId}/am/#`);
           client.subscribe(`/session/${session_id}/am/#`);
         }
 
         if (actor_id) {
-          client.unsubscribe('/actor/+/am/#');
           client.subscribe(`/actor/${actor_id}/am/#`);
         }
 
@@ -132,7 +130,7 @@ export function WorkflowManager({
 
       setMqttClient(client);
     }
-  }, [mqttConfig, mqttClient, dispatch, badConnFlag]);
+  }, [mqttConfig, mqttClient, dispatch, badConnFlag, sessionId]);
 
   return children;
 }
