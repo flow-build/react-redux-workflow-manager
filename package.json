@@ -1,6 +1,6 @@
 {
   "name": "@flowbuild/redux-toolkit-workflow-manager",
-  "version": "1.4.5",
+  "version": "1.5.0",
   "description": "Biblioteca para utilização do Workflow Manager utilizando Redux Toolkit",
   "main": "WorkflowManager.js",
   "scripts": {
