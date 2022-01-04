@@ -102,7 +102,7 @@ export function useWorkflowManager() {
       }
     } catch (error) {
       getAvailableActivityByProcessId(defaultProcess, defaultWF);
-      const message = "Erro ao tentar mudar de página na navigation.";
+      const message = "Error: On navigation page switch.";
       console.error(message, error);
     }
   }

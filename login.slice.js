@@ -82,7 +82,7 @@ const loginAction = {
           })
         );
       } else if (response.status === 401) {
-        throw new ValidationError("Credenciais Inválidas");
+        throw new ValidationError("Invalid credentials!");
       }
     } catch (error) {
       throw error;
