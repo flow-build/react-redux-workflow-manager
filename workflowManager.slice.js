@@ -168,8 +168,6 @@ export const getAvailableActivityManagersAsync =
       const baseURL = `${HOST}/processes/available`;
       const URL = filter ? `${baseURL}?${filter}` : baseURL;
 
-      // console.log("URL", URL);
-
       const r = await fetch(`${URL}`, {
         method: "GET",
         ...getDefaultHeaders(getState),
@@ -319,10 +317,12 @@ export const setFocusAndFetchActivityManagerAsync =
 
 export const selectAvailableWorkflows = (state) =>
   state.workflowManager.availableWorkflows;
+
 export const selectOrderedAvailableActivityManagers = (state) =>
   state.workflowManager.activityManagerOrder.map(
     (id) => state.workflowManager.availableActivityManagers[id]
-  );
+);
+
 export const selectCurrentActivityManager = (state) =>
   !!state.workflowManager.currentActivityManagerId
     ? state.workflowManager.availableActivityManagers[
