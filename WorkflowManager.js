@@ -36,7 +36,7 @@ export function WorkflowManager({
   const [badConnFlag, setBadConnFlag] = useState(null);
 
   useEffect(() => {
-    console.log('Use effect called');
+    console.log('WorkflowManager/useEffect: call');
 
     if (mqttConfig && !mqttClient) {
       const client = new Client(
@@ -60,7 +60,7 @@ export function WorkflowManager({
       // called when the client connects
       function onConnect() {
         // Once a connection has been made, make a subscription and send a message.
-        console.log('Connected');
+        console.log('WorkflowManager/onConnect: Connected!');
         // subscribeTopics.forEach(topic => client.subscribe(topic));
         client.subscribe(`/session/${sessionId}/am/#`, { qos: 1 });
       }
@@ -68,7 +68,7 @@ export function WorkflowManager({
       // called when the client loses its connection
       function onConnectionLost(responseObject) {
         if (responseObject.errorCode !== 0) {
-          console.log('onConnectionLost:' + responseObject.errorMessage);
+          console.log('WorkflowManager/onConnectionLost: Error message: ' + responseObject.errorMessage);
           setBadConnFlag(Math.random());
         }
       }
@@ -125,7 +125,8 @@ export function WorkflowManager({
             break;
 
           default:
-            console.log('\n\x1b[31mTÓPICO NÃO ENCONTRADO\x1b[0m\n');
+            const msg = '\n\x1b[31mWorkflowManager/onMessageArrived: TOPIC'+topic+'NOT FOUND!\x1b[0m\n';
+            console.log(msg);
         }
       }
 

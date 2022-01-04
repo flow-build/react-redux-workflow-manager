@@ -280,22 +280,17 @@ export const startWorkflowAsync =
   (workflowName, payload = {}, setFocus = true) =>
   async (dispatch, getState) => {
     try {
-      // console.log('SLICE START WORKFLOW ====>', workflowName)
+      console.log('WorkflowManager/startWorkflowAsync: Start workflow'+workflowName+'process');
       const r = await fetch(`${HOST}/workflows/name/${workflowName}/start`, {
         method: "POST",
         ...getDefaultHeaders(getState),
         body: JSON.stringify(payload),
       });
 
-      // console.log('SLICE START r ====>', r)
-
-      // console.log('r', r)
-
       if (r.ok && setFocus) {
         const responseWorkflow = await r.json();
 
-        // console.log('SLICE START responseWorkflow ====> ', responseWorkflow.process_id)
-        // console.log("responseWorkflow.process_id", responseWorkflow.process_id);
+        console.log('WorkflowManager/startWorkflowAsync: process id ', responseWorkflow.process_id)
 
         await dispatch(
           setFocusProcess({
