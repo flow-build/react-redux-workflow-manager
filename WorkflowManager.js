@@ -18,6 +18,7 @@ const randomId = [...Array(19)].map(
   (i) => chars[(Math.random() * chars.length) | 0]
 ).join``;
 
+// TAKE NOTE: https://www.hivemq.com/blog/how-to-get-started-with-mqtt/
 const MQTT_CONFIG_DEFAULT = {
   host: 'broker.hivemq.com',
   port: 8000,

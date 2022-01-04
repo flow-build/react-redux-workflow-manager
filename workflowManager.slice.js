@@ -120,6 +120,21 @@ export const {
   updateDefaultProcess,
 } = workflowManagerSlice.actions;
 
+/*
+Available async methods:
+  getAvailableWorkflowsAsync
+  getAvailableActivityManagersAsync
+  getAvailableActivityManagerForProcessAsync
+  submitActivityToActivityManagerAsync
+  startWorkflowAsync
+  setFocusAndFetchActivityManagerAsync
+  selectAvailableWorkflows
+  selectOrderedAvailableActivityManagers
+  selectCurrentActivityManager
+  selectFocusProcess
+  wfStart
+*/
+
 export const getAvailableWorkflowsAsync = () => async (dispatch, getState) => {
   try {
     const r = await fetch(`${HOST}/workflows`, {

@@ -28,7 +28,7 @@ export function useWorkflowManager() {
 
   /**
    * Function that receive an **actor** and **password** to make login
-   * @param {String} URL The URL to make login
+   * @param {String} URL The Flowbuild server host to make login
    * @param {{actor: String, password: String}} body A object to send to login
    * @returns {Promise} Returns a promise to wait login
    */
@@ -116,7 +116,7 @@ export function useWorkflowManager() {
   }
 
   /**
-   * This function submits a payload for a specific acitivity
+   * This function submits a payload for a specific activity
    * @param {String} activityId It represents the activity's ID
    * @param {Object} payload It represents what you want to send
    */
