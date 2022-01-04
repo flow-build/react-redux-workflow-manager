@@ -56,7 +56,7 @@ const loginAction = {
         ...getDefaultHeaders(),
         body: JSON.stringify(body),
       });
-      console.log("response", response);
+      console.log("WorkflowManager/loginAction: response ", response);
 
       if (response.ok) {
         const data = await response.json();
@@ -82,7 +82,7 @@ const loginAction = {
           })
         );
       } else if (response.status === 401) {
-        throw new ValidationError("Credenciais Inválidas");
+        throw new ValidationError("Invalid credentials!");
       }
     } catch (error) {
       throw error;
