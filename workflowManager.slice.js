@@ -121,7 +121,8 @@ export const {
 } = workflowManagerSlice.actions;
 
 /*
-Available async methods:
+@abstract Name of async functions up this line in code 
+@async:
   getAvailableWorkflowsAsync
   getAvailableActivityManagersAsync
   getAvailableActivityManagerForProcessAsync
@@ -136,6 +137,10 @@ Available async methods:
 */
 
 export const getAvailableWorkflowsAsync = () => async (dispatch, getState) => {
+  /*
+  @abstract : Updates available workflows
+  @author   : Bruno Peixoto 
+  */
   try {
     const r = await fetch(`${HOST}/workflows`, {
       method: "GET",
@@ -164,6 +169,10 @@ export const getAvailableWorkflowsAsync = () => async (dispatch, getState) => {
 
 export const getAvailableActivityManagersAsync =
   (filter) => async (dispatch, getState) => {
+    /*
+    @abstract : Updates available activity managers (am for short)
+    @author   : Bruno Peixoto 
+    */
     try {
       const baseURL = `${HOST}/processes/available`;
       const URL = filter ? `${baseURL}?${filter}` : baseURL;
@@ -204,6 +213,11 @@ export const getAvailableActivityManagersAsync =
 
 export const getAvailableActivityManagerForProcessAsync =
   (processId, workflow_name_default) => async (dispatch, getState) => {
+    /*
+    @abstract : Updates available activity managers (am for short) of specific process processId
+    @author   : Bruno Peixoto 
+    */
+
     try {
       const r = await fetch(`${HOST}/processes/${processId}/activity`, {
         method: "GET",
@@ -235,6 +249,11 @@ export const getAvailableActivityManagerForProcessAsync =
 
 export const submitActivityToActivityManagerAsync =
   (activityManagerId, data) => async (dispatch, getState) => {
+    /*
+    @abstract : Submit activity to specific activity manager am_id
+    @author   : Bruno Peixoto 
+    */
+    
     try {
       let r = await fetch(
         `${HOST}/activity_manager/${activityManagerId}/submit`,
@@ -311,26 +330,51 @@ export const startWorkflowAsync =
 
 export const setFocusAndFetchActivityManagerAsync =
   (processId) => async (dispatch, getState) => {
+    /*
+    @abstract : Prioritize specific process and updates respective activity manager
+    @author   : Bruno Peixoto 
+    */
+
     await dispatch(setFocusProcess({ processId }));
     await dispatch(getAvailableActivityManagerForProcessAsync(processId));
   };
 
-export const selectAvailableWorkflows = (state) =>
-  state.workflowManager.availableWorkflows;
+/*
+  @abstract : Selects the available workflows on ${HOST}
+  @author   : Bruno Peixoto 
+*/
+export const selectAvailableWorkflows = (state) => state.workflowManager.availableWorkflows;
 
+/*
+  @abstract : Selects the available workflows on ${HOST} by given order
+  @author   : Bruno Peixoto 
+*/
 export const selectOrderedAvailableActivityManagers = (state) =>
   state.workflowManager.activityManagerOrder.map(
     (id) => state.workflowManager.availableActivityManagers[id]
 );
 
+/*
+  @abstract : Selects the available workflows on ${HOST} by given order
+  @author   : Bruno Peixoto 
+*/
 export const selectCurrentActivityManager = (state) =>
   !!state.workflowManager.currentActivityManagerId
     ? state.workflowManager.availableActivityManagers[
         state.workflowManager.currentActivityManagerId
       ]
     : null;
+
+/*
+  @abstract : Selects the process :process_id under focus
+  @author   : Bruno Peixoto 
+*/
 export const selectFocusProcess = (state) => state.workflowManager.focusProcess;
 
+/*
+  @abstract : Selects ???
+  @author   : Bruno Peixoto 
+*/
 export const wfStart = (state) => state.startWorkflow;
 
 const WorkflowManagerSlice = (URL) => {
